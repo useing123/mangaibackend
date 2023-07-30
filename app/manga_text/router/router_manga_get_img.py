@@ -1,10 +1,11 @@
 from fastapi import Depends, HTTPException, status
+from typing import List
 from app.utils import AppModel
 from ..service import Service, get_service
 from . import router
 
 class MangaDetailsResponse(AppModel):
-    imgur_links: str
+    imgur_links: List[str]
     manga_frames_description: str
     manga_story_dialogs: str
 
