@@ -19,7 +19,7 @@ def get_manga_details(
     if manga_data is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Manga not found")
 
-    imgur_links = manga_data.get("imgur_links", "")
+    imgur_links = manga_data.get("imgur_links", [])
     manga_frames_description = manga_data.get("manga_frames_description", "")
     manga_story_dialogs = manga_data.get("manga_story_dialogs", "")
 
