@@ -38,7 +38,6 @@ def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_
     time.sleep(15)
     prompt_image_description = agent_create_images_description(manga_id, manga_frames_description, repository)
     # time.sleep(15)
-    print(manga_dialogs)
     generate_image(manga_id, prompt_image_description, repository)
 
 
@@ -317,7 +316,7 @@ def generate_image(manga_id: str, manga_images_description: str, repository: Man
     for frame in frames:
         # Call the Replicate API to generate an image
         model_version = "cjwbw/anything-v3-better-vae:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65"
-        inputs = {"prompt": frame, "width": 512, "height": 512}
+        inputs = {"prompt": frame}
 
         # We need to set the token environment variable for the replicate.run function
         os.environ['REPLICATE_API_TOKEN'] = replicate_api_token
