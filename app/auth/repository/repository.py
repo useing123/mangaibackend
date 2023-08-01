@@ -3,6 +3,7 @@ from typing import Optional
 
 from bson.objectid import ObjectId
 from pymongo.database import Database
+from pymongo.errors import DuplicateKeyError
 
 from ..utils.security import hash_password
 
@@ -19,7 +20,10 @@ class AuthRepository:
             "created_at": datetime.utcnow(),
         }
 
-        self.database["users"].insert_one(payload)
+        try:
+            self.database["users"].insert_one(payload)
+        except DuplicateKeyError:
+            raise  # Повторно выбрасываем исключение
 
     def get_user_by_id(self, user_id: str) -> Optional[dict]:
         user = self.database["users"].find_one(
@@ -45,9 +49,3 @@ class AuthRepository:
 
     def count_users(self) -> int:
         return self.database["users"].count_documents({})
-    
-    def generate_password_reset_token(self, email: str) -> Optional[str]:
-        user = self.get_user_by_email(email)
-        if not user:
-            return None
-
