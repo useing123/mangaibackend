@@ -51,13 +51,3 @@ class AuthRepository:
         if not user:
             return None
 
-    # Generate a random token for password reset
-    token = secrets.token_hex(20)
-
-    # Save the token in the user's data
-    self.database["users"].update_one(
-        {"_id": ObjectId(user["_id"])},
-        {"$set": {"password_reset_token": token}},
-    )
-
-    return token
