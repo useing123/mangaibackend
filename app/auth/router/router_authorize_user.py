@@ -12,6 +12,7 @@ from .errors import InvalidCredentialsException
 class AuthorizeUserResponse(AppModel):
     access_token: str
     token_type: str = "Bearer"
+    
 
 
 @router.post("/users/tokens", response_model=AuthorizeUserResponse)

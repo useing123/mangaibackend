@@ -5,11 +5,14 @@ from ..service import Service, get_service
 from ..adapters.jwt_service import JWTData
 from . import router
 from .dependencies import parse_jwt_user_data
+from typing import List, Optional
 
 class UpdateUserRequest(AppModel):
     first_name: Optional[str]
     last_name: Optional[str]
     avatar: Optional[str]
+    favorite_genres: Optional[List[str]]
+    read_mangas: Optional[List[str]]
 
 @router.put("/users/me")
 async def update_user(
@@ -32,3 +35,4 @@ async def update_user(
         svc.repository.update_user(user_id, update_dict)
 
     return {"detail": "User data updated successfully."}
+
