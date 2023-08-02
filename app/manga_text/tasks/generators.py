@@ -21,23 +21,23 @@ def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_
     print(REPLICATE_API_TOKEN)
     print(IMGUR_CLIENT_ID)
     title = generate_title(manga_id, manga_genre, prompt, repository)
-    time.sleep(15)
+    time.sleep(12)
     chapter_title = generate_chapter_title(manga_id, manga_genre, title, manga_chapters_cnt, repository)
-    time.sleep(15)
+    time.sleep(12)
     main_characters = generate_main_characters(manga_id, title, manga_genre, repository)
-    time.sleep(15)
+    time.sleep(12)
     fun_characters = generate_funservice_characters(manga_id, title, manga_genre, repository)
-    time.sleep(15)
+    time.sleep(12)
     detailed_characters = generate_detailed_characters(manga_id, title, main_characters, fun_characters, repository)
-    time.sleep(15)
+    time.sleep(12)
     manga_story = generate_manga_story(manga_id, prompt, manga_genre, title, chapter_title, main_characters, fun_characters, repository)
-    time.sleep(15)
+    time.sleep(12)
     manga_frames_description = agent_create_frames_description(manga_id, title, manga_genre, detailed_characters, manga_story, repository)
-    time.sleep(15)
+    time.sleep(12)
     manga_dialogs = agent_create_dialogs(manga_id, manga_frames_description, detailed_characters, repository)
-    time.sleep(15)
+    time.sleep(12)
     prompt_image_description = agent_create_images_description(manga_id, manga_frames_description, repository)
-    # time.sleep(15)
+    # time.sleep(12)
     generate_image(manga_id, prompt_image_description, repository)
 
 
@@ -172,7 +172,7 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     return manga_chapters_story
 
 
-#Описываем 15 кадров манги
+#Описываем 12 кадров манги
 def agent_create_frames_description(manga_id: str, manga_title: str, genre: str, detailed_characters: str, manga_chapters_story: str, repository: MangaRepository) -> str:
     prompt = f"""
     Create a manga consisting of 24 frames for the manga titled "{manga_title}" in the {genre} genre. In each frame, avoid including any explicit content or fanservice. Instead, focus on describing the actions of the characters without using their names. You can refer to the provided detailed descriptions of the characters for this purpose. Please ensure that each frame is descriptive and conveys the progression of the story. 
@@ -253,55 +253,6 @@ def agent_create_images_description(manga_id: str, manga_frames_description: str
     manga_images_description = response['choices'][0]['message']['content'].strip()
     repository.update_manga(manga_id, {"manga_images_description": manga_images_description})
     return manga_images_description
-
-
-# Тут должна быть штука которая ИИ модель заходит в ембединг и пишет text2stable diffusion prompt
-# def generate_text_to_stable_diffusion_prompt(manga_frames_description: str) -> str:
-#     # Construct a prompt for text-to-stable-diffusion
-#     prompt = f"Input: {manga_frames_descripti let a: on}\nOutput:"
-
-#     # ... Additional logic to customize the prompt as needed ...
-
-#     return prompt
-
-# def generate_image(manga_id: str, manga_images_description: str, repository: MangaRepository): 
-#     os.environ["REPLICATE_API_TOKEN"] = replicate_api_key
-
-#     # Split the input text into frames
-#     frames = re.split(r'Frame №\d+: ', input_text)[1:]
-
-#     imgur_links = []
-
-#     for frame in frames:
-#         # Call the Replicate API to generate an image
-#         model_version = "cjwbw/anything-v4.0:42a996d39a96aedc57b2e0aa8105dea39c9c89d9d266caf6bb4327a1c191b061"
-#         inputs = {"prompt": frame}
-#         output_urls = replicate.run(model_version, input=inputs)
-
-#         # The output_urls is a list of URLs, we'll just use the first one
-#         image_url = output_urls[0]
-
-#         # Download the image
-#         image_response = requests.get(image_url)
-
-#         # Convert the image to base64
-#         image_base64 = base64.b64encode(image_response.content).decode()
-
-#         # Call the Imgur API to upload the image
-#         headers = {
-#             "Authorization": f"Client-ID {IMGUR_CLIENT_ID}"
-#         }
-#         data = {
-#             "image": image_base64,
-#             "type": "base64"
-#         }
-#         response = requests.post("https://api.imgur.com/3/image", headers=headers, data=data)
-
-#         # Add the Imgur link to the list
-#         imgur_links.append(response.json()["data"]["link"])
-
-#     # Return the Imgur links
-#     return {"imgur_links": imgur_links}
 
 
 def generate_image(manga_id: str, manga_images_description: str, repository: MangaRepository): 

@@ -1,8 +1,6 @@
-from fastapi import Depends, HTTPException, status
-from app.auth.router.dependencies import parse_jwt_user_data
+from fastapi import HTTPException, status
 from app.utils import AppModel
 from ..service import Service, get_service
-from ..adapters.jwt_service import JWTData
 from . import router
 
 class MangaGetResponse(AppModel):
@@ -23,7 +21,6 @@ class MangaGetResponse(AppModel):
 @router.get("/read/{manga_id}", response_model=MangaGetResponse)
 def get_manga(
     manga_id: str,
-    jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> MangaGetResponse:
     manga_data = svc.repository.get_manga(manga_id)
