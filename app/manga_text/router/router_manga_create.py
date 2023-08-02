@@ -7,6 +7,8 @@ from ..adapters.jwt_service import JWTData
 from ..tasks.generators import fill_manga_info
 from . import router
 
+import threading
+
 
 class MangaCreateRequest(AppModel):
     genre: str
@@ -34,13 +36,11 @@ def create_manga(
     num_of_chapters = input.chapters_count
     prompt = input.prompt
 
-    background_tasks.add_task(
-        fill_manga_info,
-        manga_id,
-        manga_genre,
-        prompt,
-        num_of_chapters,
-        svc.repository
+    # Start a new thread for manga generation
+    manga_generation_thread = threading.Thread(
+        target=fill_manga_info,
+        args=(manga_id, manga_genre, prompt, num_of_chapters, svc.repository),
     )
+    manga_generation_thread.start()
 
     return MangaCreateResponse(manga_id=manga_id)
