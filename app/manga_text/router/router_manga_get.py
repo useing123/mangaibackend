@@ -17,6 +17,7 @@ class MangaGetResponse(AppModel):
     manga_frames_description: str
     manga_story_dialogs: str
     manga_images_description: str
+    imgur_links: list[str]  # Add this line
 
 @router.get("/read/{manga_id}", response_model=MangaGetResponse)
 def get_manga(
@@ -41,7 +42,8 @@ def get_manga(
         manga_chapters_story=manga_data.get("manga_chapters_story", ""),
         manga_frames_description=manga_data.get("manga_frames_description", ""),
         manga_story_dialogs=manga_data.get("manga_story_dialogs", ""),
-        manga_images_description=manga_data.get("manga_images_description", "")
+        manga_images_description=manga_data.get("manga_images_description", ""),
+        imgur_links=manga_data.get("imgur_links", [])  # And add this line
     )
 
     return manga
