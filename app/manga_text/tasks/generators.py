@@ -21,23 +21,23 @@ def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_
     print(REPLICATE_API_TOKEN)
     print(IMGUR_CLIENT_ID)
     title = generate_title(manga_id, manga_genre, prompt, repository)
-    time.sleep(20)
+    time.sleep(15)
     chapter_title = generate_chapter_title(manga_id, manga_genre, title, manga_chapters_cnt, repository)
-    time.sleep(20)
+    time.sleep(15)
     main_characters = generate_main_characters(manga_id, title, manga_genre, repository)
-    time.sleep(20)
+    time.sleep(15)
     fun_characters = generate_funservice_characters(manga_id, title, manga_genre, repository)
-    time.sleep(20)
+    time.sleep(15)
     detailed_characters = generate_detailed_characters(manga_id, title, main_characters, fun_characters, repository)
-    time.sleep(20)
+    time.sleep(15)
     manga_story = generate_manga_story(manga_id, prompt, manga_genre, title, chapter_title, main_characters, fun_characters, repository)
-    time.sleep(20)
+    time.sleep(15)
     manga_frames_description = agent_create_frames_description(manga_id, title, manga_genre, detailed_characters, manga_story, repository)
-    time.sleep(20)
+    time.sleep(15)
     manga_dialogs = agent_create_dialogs(manga_id, manga_frames_description, detailed_characters, repository)
-    time.sleep(20)
+    time.sleep(15)
     prompt_image_description = agent_create_images_description(manga_id, manga_frames_description, repository)
-    # time.sleep(20)
+    # time.sleep(15)
     generate_image(manga_id, prompt_image_description, repository)
 
 
@@ -172,7 +172,7 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     return manga_chapters_story
 
 
-#Описываем 20 кадров манги
+#Описываем 15 кадров манги
 def agent_create_frames_description(manga_id: str, manga_title: str, genre: str, detailed_characters: str, manga_chapters_story: str, repository: MangaRepository) -> str:
     prompt = f"""
     Create a manga consisting of 24 frames for the manga titled "{manga_title}" in the {genre} genre. In each frame, avoid including any explicit content or fanservice. Instead, focus on describing the actions of the characters without using their names. You can refer to the provided detailed descriptions of the characters for this purpose. Please ensure that each frame is descriptive and conveys the progression of the story. 
