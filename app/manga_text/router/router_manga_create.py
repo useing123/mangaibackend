@@ -26,10 +26,9 @@ class MangaCreateResponse(AppModel):
 def create_manga(
     input: MangaCreateRequest,
     background_tasks: BackgroundTasks,
-    jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> MangaCreateResponse:
-    result = svc.repository.create_manga(input.dict(), jwt_data.user_id)
+    result = svc.repository.create_manga(input.dict())
 
     manga_id = str(result.inserted_id)
     manga_genre = input.genre
@@ -44,3 +43,29 @@ def create_manga(
     manga_generation_thread.start()
 
     return MangaCreateResponse(manga_id=manga_id)
+
+
+# @router.post(
+#     "/generate", status_code=status.HTTP_201_CREATED, response_model=MangaCreateResponse
+# )
+# def create_manga(
+#     input: MangaCreateRequest,
+#     background_tasks: BackgroundTasks,
+#     jwt_data: JWTData = Depends(parse_jwt_user_data),
+#     svc: Service = Depends(get_service),
+# ) -> MangaCreateResponse:
+#     result = svc.repository.create_manga(input.dict(), jwt_data.user_id)
+
+#     manga_id = str(result.inserted_id)
+#     manga_genre = input.genre
+#     num_of_chapters = input.chapters_count
+#     prompt = input.prompt
+
+#     # Start a new thread for manga generation
+#     manga_generation_thread = threading.Thread(
+#         target=fill_manga_info,
+#         args=(manga_id, manga_genre, prompt, num_of_chapters, svc.repository),
+#     )
+#     manga_generation_thread.start()
+
+#     return MangaCreateResponse(manga_id=manga_id)
