@@ -17,7 +17,7 @@ IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")
 
 
 #включать выключатель
-def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
+def fill_manga_info(manga_id    : str, manga_genre: str, prompt:str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
     title = generate_title(manga_id, manga_genre, prompt, repository)
     time.sleep(15)
     chapter_title = generate_chapter_title(manga_id, manga_genre, title, manga_chapters_cnt, repository)

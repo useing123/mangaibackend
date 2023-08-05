@@ -7,12 +7,9 @@ from ..adapters.jwt_service import JWTData
 from datetime import datetime
 from . import router
 
-from fastapi import HTTPException
+from pydantic import Field
 
-class ReviewCreateRequest(AppModel):
-    manga_id: str
-    review: str
-    rating: int
+from fastapi import HTTPException
 
 class Review(AppModel):
     user_id: str
@@ -20,8 +17,12 @@ class Review(AppModel):
     rating: int
     created_at: datetime
 
-class ReviewList(AppModel):
-    reviews: list[Review]
+
+class ReviewCreateRequest(AppModel):
+    manga_id: str
+    review: str
+    rating: int = Field(..., ge=0, le=10)
+
 
 @router.post("/reviews", status_code=status.HTTP_201_CREATED)
 def create_review(
@@ -32,21 +33,7 @@ def create_review(
     result = svc.repository.create_review(input.dict(), input.manga_id, jwt_data.user_id)
     return {"review_id": str(result.inserted_id)}
 
-@router.get("/reviews/{manga_id}", response_model=ReviewList)
-def get_reviews(
-    manga_id: str,
-    svc: Service = Depends(get_service),
-):
-    reviews = svc.repository.get_reviews_by_manga(manga_id)
-    return ReviewList(reviews=reviews)
 
-@router.delete("/reviews/{review_id}")
-def delete_review(
-    review_id: str,
-    jwt_data: JWTData = Depends(parse_jwt_user_data),
-    svc: Service = Depends(get_service),
-):
-    result = svc.repository.delete_review(review_id, jwt_data.user_id)
-    if result.deleted_count == 0:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Review not found")
-    return {"message": "Review deleted"}
+
+
+

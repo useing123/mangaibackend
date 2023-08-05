@@ -52,17 +52,34 @@ class MangaRepository:
         return list(self.database["mangas"].find({}, {"_id": 1, "genre": 1, "title": 1, "main_characters": 1}))
     
     def create_review(self, input_data: dict, manga_id: str, user_id: str) -> InsertOneResult:
-        payload = {
-            "review": input_data["review"],
-            "rating": input_data["rating"],
-            "manga_id": manga_id,
-            "user_id": user_id,
-            "created_at": datetime.utcnow(),
-        }
-        return self.database["reviews"].insert_one(payload)
+            payload = {
+                "review": input_data["review"],
+                "rating": input_data["rating"],
+                "manga_id": manga_id,
+                "user_id": user_id,
+                "created_at": datetime.utcnow(),
+            }
+            return self.database["reviews"].insert_one(payload)
 
     def get_reviews_by_manga(self, manga_id: str) -> list[dict]:
         return list(self.database["reviews"].find({"manga_id": manga_id}, {"_id": 0}))
 
     def delete_review(self, review_id: str, user_id: str) -> DeleteResult:
         return self.database["reviews"].delete_one({"_id": ObjectId(review_id), "user_id": user_id})
+
+    def update_review(self, review_id: str, update_data: dict) -> UpdateResult:
+        return self.database["reviews"].update_one(
+            filter={"_id": ObjectId(review_id)}, 
+            update={
+                "$set":{
+                    "review": update_data["review"],
+                    "rating": update_data["rating"],
+                }
+            },
+        )
+
+    def get_review_by_id(self, review_id: str) -> dict:
+        return self.database["reviews"].find_one({"_id": ObjectId(review_id)})
+
+    def get_review_by_manga(self, manga_id: str, user_id: str) -> Optional[dict]:
+        return self.database["reviews"].find_one({"manga_id": manga_id, "user_id": user_id})
