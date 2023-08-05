@@ -231,13 +231,13 @@ def agent_create_images_description(manga_id: str, manga_frames_description: str
     str: Prompts for painting images using Stable Diffusion.
     """
     prompt = f"""
-    Upgrade the prompt for generating an image using Stable Diffusion based on the given parameters. The prompt should consist of a detailed and specific description of the characters and the events happening in the manga frames, without including any NSFW (Not Safe for Work) content description.
+    Modernize the tooltip to generate an image using Stable Diffusion according to the specified parameters. The hint should consist of a detailed and specific description of the characters and events occurring in the manga frames, without including NSFW (Not Safe for Work) content descriptions.
 
-    Your task is to upgrade the prompt to provide enough information and context for the AI to generate an image using Stable Diffusion. Your description should accurately convey the desired visual elements, actions, emotions, and relationships between the characters. The upgraded prompt should be unique and distinct, encouraging the AI to generate creative and original image outputs based on the given description.
+    Your job is to modernize the hint in a way that provides enough information and context for the AI to generate an image using Stable Diffusion, since Stable Diffusion doesn't understand what the characters look like. The description must accurately convey the desired visual elements, actions, emotions, and relationships between characters. The modernized tooltip should be unique and distinctive and should not contain names, encouraging the AI to generate creative and original images based on this description.
 
-    Please ensure your language is clear and concise, and incorporate the special "{manga_frames_description}" to provide a detailed and specific version of the prompt.
+    Please make sure your wording is clear and concise, and use the special option to avoid mentioning names and replace them with a description from "{manga_frames_description}" to provide a detailed and specific version of the hint.
 
-    Note: Make sure to follow ethical guidelines and avoid any inappropriate or offensive content in your description.
+    Note: Be sure to be ethical and avoid inappropriate or offensive content in your description.
     """
     
     response = openai.ChatCompletion.create(
