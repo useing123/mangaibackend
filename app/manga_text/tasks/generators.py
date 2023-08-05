@@ -292,7 +292,7 @@ def generate_image(manga_id: str, manga_images_description: str, repository: Man
         response = requests.post("https://api.imgur.com/3/image", headers=headers, data=data)
 
         # Add the Imgur link to the list
-        imgur_links.append(response.json()["data"]["link"])
+        imgur_links.append(response.json().get("data", {}).get("link", "default_link"))
 
     # Update manga information with the Imgur links in the repository
     repository.update_manga(manga_id, {"imgur_links": imgur_links})
