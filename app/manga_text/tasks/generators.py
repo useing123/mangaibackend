@@ -263,40 +263,48 @@ def generate_image(manga_id: str, manga_images_description: str, repository: Man
     imgur_links = []
 
     for frame in frames:
-        # Call the Replicate API to generate an image
-        model_version = "stability-ai/sdxl:2b017d9b67edd2ee1401238df49d75da53c523f36e363881e057f5dc3ed3c5b2"
-        inputs = {"prompt": frame}
-
-        # We need to set the token environment variable for the replicate.run function
-        os.environ['REPLICATE_API_TOKEN'] = replicate_api_token
-
-        outputs = replicate.run(model_version, input=inputs)
-
-        # The outputs contains a list of URLs, we'll just use the first one
-        image_url = outputs[0]
-
-        # Download the image
-        image_response = requests.get(image_url)
-
-        # Convert the image to base64
-        image_base64 = base64.b64encode(image_response.content).decode()
-
-        # Call the Imgur API to upload the image
-        headers = {
-            "Authorization": f"Client-ID {imgur_client_id_value}"
-        }
-        data = {
-            "image": image_base64,
-            "type": "base64"
-        }
-        response = requests.post("https://api.imgur.com/3/image", headers=headers, data=data)
-
-        # Add the Imgur link to the list
-        imgur_links.append(response.json()["data"]["link"])
+        # Construct the prompt by adding desired keywords at the beginning and end
+        prompt = f"A manga key visual from Jojo's Bizzare Adventure {frame} sharp, carefully drawn, detailed, beautiful, wallpaper 4K, Yen Press, Kyoto Animation, pixiv, official media"
         
+        try:
+            # Call the Replicate API to generate an image
+            model_version = "stability-ai/sdxl:2b017d9b67edd2ee1401238df49d75da53c523f36e363881e057f5dc3ed3c5b2"
+            inputs = {"prompt": prompt}
+
+            # We need to set the token environment variable for the replicate.run function
+            os.environ['REPLICATE_API_TOKEN'] = replicate_api_token
+
+            outputs = replicate.run(model_version, input=inputs)
+
+            # The outputs contains a list of URLs, we'll just use the first one
+            image_url = outputs[0]
+
+            # Download the image
+            image_response = requests.get(image_url)
+
+            # Convert the image to base64
+            image_base64 = base64.b64encode(image_response.content).decode()
+
+            # Call the Imgur API to upload the image
+            headers = {
+                "Authorization": f"Client-ID {imgur_client_id_value}"
+            }
+            data = {
+                "image": image_base64,
+                "type": "base64"
+            }
+            response = requests.post("https://api.imgur.com/3/image", headers=headers, data=data)
+
+            # Add the Imgur link to the list
+            imgur_links.append(response.json()["data"]["link"])
+        
+        except KeyError:
+            # Handle the KeyError by skipping this iteration and moving to the next frame
+            continue
 
     # Update manga information with the Imgur links in the repository
     repository.update_manga(manga_id, {"imgur_links": imgur_links})
 
     # Return the Imgur links
     return {"imgur_links": imgur_links}
+
