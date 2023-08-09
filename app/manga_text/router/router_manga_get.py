@@ -1,9 +1,8 @@
 from fastapi import Depends, HTTPException, status
-from app.auth.router.dependencies import parse_jwt_user_data
 from app.utils import AppModel
 from ..service import Service, get_service
-from ..adapters.jwt_service import JWTData
 from . import router
+#import depends
 
 class MangaGetResponse(AppModel):
     manga_id: str
@@ -19,11 +18,11 @@ class MangaGetResponse(AppModel):
     manga_frames_description: str
     manga_story_dialogs: str
     manga_images_description: str
+    imgur_links: list[str]  # Add this line
 
 @router.get("/read/{manga_id}", response_model=MangaGetResponse)
 def get_manga(
     manga_id: str,
-    jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
 ) -> MangaGetResponse:
     manga_data = svc.repository.get_manga(manga_id)
@@ -44,7 +43,8 @@ def get_manga(
         manga_chapters_story=manga_data.get("manga_chapters_story", ""),
         manga_frames_description=manga_data.get("manga_frames_description", ""),
         manga_story_dialogs=manga_data.get("manga_story_dialogs", ""),
-        manga_images_description=manga_data.get("manga_images_description", "")
+        manga_images_description=manga_data.get("manga_images_description", ""),
+        imgur_links=manga_data.get("imgur_links", [])  # And add this line
     )
 
     return manga

@@ -3,9 +3,9 @@ import openai
 import replicate
 import time
 from ..service import MangaRepository
-import replicate
 import requests
 from dotenv import load_dotenv
+import asyncio
 
 import base64
 import re
@@ -17,29 +17,30 @@ IMGUR_CLIENT_SECRET = os.getenv("IMGUR_CLIENT_SECRET")
 
 
 #включать выключатель
-def fill_manga_info(manga_id    : str, manga_genre: str, prompt:str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
-    title = generate_title(manga_id, manga_genre, prompt, repository)
-    time.sleep(15)
-    chapter_title = generate_chapter_title(manga_id, manga_genre, title, manga_chapters_cnt, repository)
-    time.sleep(15)
-    main_characters = generate_main_characters(manga_id, title, manga_genre, repository)
-    time.sleep(15)
-    fun_characters = generate_funservice_characters(manga_id, title, manga_genre, repository)
-    time.sleep(15)
-    detailed_characters = generate_detailed_characters(manga_id, title, main_characters, fun_characters, repository)
-    time.sleep(15)
-    manga_story = generate_manga_story(manga_id, prompt, manga_genre, title, chapter_title, main_characters, fun_characters, repository)
-    time.sleep(15)
-    manga_frames_description = agent_create_frames_description(manga_id, title, manga_genre, detailed_characters, manga_story, repository)
-    time.sleep(15)
-    manga_dialogs = agent_create_dialogs(manga_id, manga_frames_description, detailed_characters, repository)
-    time.sleep(15)
-    prompt_image_description = agent_create_images_description(manga_id, manga_frames_description, repository)
-    # time.sleep(15)
-    generate_image(manga_id, prompt_image_description, repository)
+async def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
+    
+    title = await generate_title(manga_id, manga_genre, prompt, repository)
+    await asyncio.sleep(20)
+    chapter_title = await generate_chapter_title(manga_id, manga_genre, title, manga_chapters_cnt, repository)
+    await asyncio.sleep(20)
+    main_characters = await generate_main_characters(manga_id, title, manga_genre, repository)
+    await asyncio.sleep(20)
+    fun_characters = await generate_funservice_characters(manga_id, title, manga_genre, repository)
+    await asyncio.sleep(20)
+    detailed_characters = await generate_detailed_characters(manga_id, title, main_characters, fun_characters, repository)
+    await asyncio.sleep(20)
+    manga_story = await generate_manga_story(manga_id, prompt, manga_genre, title, chapter_title, main_characters, fun_characters, repository)
+    await asyncio.sleep(20)
+    manga_frames_description = await agent_create_frames_description(manga_id, title, manga_genre, detailed_characters, manga_story, repository)
+    await asyncio.sleep(20)
+    manga_dialogs = await agent_create_dialogs(manga_id, manga_frames_description, detailed_characters, repository)
+    await asyncio.sleep(20)
+    prompt_image_description = await agent_create_images_description(manga_id, manga_frames_description, repository)
+    # await asyncio.time.sleep(12)
+    await generate_image(manga_id, prompt_image_description, repository)
 
 
-def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: MangaRepository) -> str:
+async def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: MangaRepository) -> str:
     prompt = f"""
     Please generate a title for a manga in the {manga_genre} genre that incorporates the theme of "Keep this {prompt} in mind." The title should be creative, unique, and suitable for a manga in the specified genre. Your response should be a title without quotation marks.
     """
@@ -56,7 +57,7 @@ def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: Mang
     return manga_title
 
 
-def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
+async def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
     chapters = []
     for index in range(manga_chapters_cnt):
         prompt = f"Generate a title for a chapter #{index + 1}/{manga_chapters_cnt} in manga called '{manga_title}' in {manga_genre} genre:"
@@ -72,7 +73,7 @@ def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, ma
     repository.update_manga(manga_id, {"chapters_title": chapters})
 
 
-def generate_main_characters(manga_id: str, manga_title: str, genre: str, repository: MangaRepository) -> str:
+async def generate_main_characters(manga_id: str, manga_title: str, genre: str, repository: MangaRepository) -> str:
     prompt = f"""
     Please analyze the genre {genre} and provide detailed descriptions of the main characters in the manga {manga_title}
     Your descriptions should explore the key features of the genre and highlight the unique traits, personalities, and roles of each character. Please use the following format to introduce each character: "Who is 
@@ -96,7 +97,7 @@ def generate_main_characters(manga_id: str, manga_title: str, genre: str, reposi
     return main_characters
 
 
-def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, repository: MangaRepository) -> str:
+async def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, repository: MangaRepository) -> str:
     prompt = f"""
     Your task is to analyze the manga "{manga_title}" and identify the fanservice characters within the genre of "{genre}". Please provide detailed descriptions of each fanservice character, explaining their unique characteristics and roles within the story.
 
@@ -117,7 +118,7 @@ def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, 
     return funservice_characters
 
 
-def generate_detailed_characters(manga_id: str, manga_title: str, main_characters: str, funservice_characters: str, repository: MangaRepository) -> str:
+async def generate_detailed_characters(manga_id: str, manga_title: str, main_characters: str, funservice_characters: str, repository: MangaRepository) -> str:
     prompt = f"""
     Please provide a detailed appearance description for the characters in the manga titled {manga_title}. Your descriptions will be used as a reference for drawing the characters. 
 
@@ -145,7 +146,7 @@ def generate_detailed_characters(manga_id: str, manga_title: str, main_character
     return detailed_characters
 
 
-def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_title: str, manga_title: str, main_characters:str, funservice_characters:str, repository: MangaRepository) -> str:
+async def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_title: str, manga_title: str, main_characters:str, funservice_characters:str, repository: MangaRepository) -> str:
     prompt = f"""
     You are an experienced manga author with 150 years of experience. Your task is to create a coherent and engaging story for a manga titled "{manga_title}" in the {genre} genre. The story description should be for a chapter titled "{manga_chapters_title}". You are free to explore any ideas and themes for the story, without limitations.
 
@@ -170,8 +171,8 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     return manga_chapters_story
 
 
-#Описываем 15 кадров манги
-def agent_create_frames_description(manga_id: str, manga_title: str, genre: str, detailed_characters: str, manga_chapters_story: str, repository: MangaRepository) -> str:
+#Описываем 12 кадров манги
+async def agent_create_frames_description(manga_id: str, manga_title: str, genre: str, detailed_characters: str, manga_chapters_story: str, repository: MangaRepository) -> str:
     prompt = f"""
     Create a manga consisting of 24 frames for the manga titled "{manga_title}" in the {genre} genre. In each frame, avoid including any explicit content or fanservice. Instead, focus on describing the actions of the characters without using their names. You can refer to the provided detailed descriptions of the characters for this purpose. Please ensure that each frame is descriptive and conveys the progression of the story. 
 
@@ -195,7 +196,7 @@ def agent_create_frames_description(manga_id: str, manga_title: str, genre: str,
 
 
 #Эта штука извлекает диалоги из фреймов
-def agent_create_dialogs(manga_id: str, manga_frames_description: str, detailed_characters: str, repository: MangaRepository) -> str:
+async def agent_create_dialogs(manga_id: str, manga_frames_description: str, detailed_characters: str, repository: MangaRepository) -> str:
     """
     Parameters:
     manga_id (str): The ID of the manga.
@@ -220,7 +221,7 @@ def agent_create_dialogs(manga_id: str, manga_frames_description: str, detailed_
     return manga_story_dialogs
 
 #Эта штука извлекает описание сцены из фреймов надо переписать нормальной пока что это затычка нужно будет зайти в https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts/viewer/Gustavosta--Stable-Diffusion-Prompts/test и взять от туда
-def agent_create_images_description(manga_id: str, manga_frames_description: str, repository: MangaRepository) -> str:
+async def agent_create_images_description(manga_id: str, manga_frames_description: str, repository: MangaRepository) -> str:
     """
     Parameters:
     manga_id (str): The ID of the manga.
@@ -231,13 +232,13 @@ def agent_create_images_description(manga_id: str, manga_frames_description: str
     str: Prompts for painting images using Stable Diffusion.
     """
     prompt = f"""
-    Modernize the tooltip to generate an image using Stable Diffusion according to the specified parameters. The hint should consist of a detailed and specific description of the characters and events occurring in the manga frames, without including NSFW (Not Safe for Work) content descriptions.
+    Upgrade the prompt for generating an image using Stable Diffusion based on the given parameters. The prompt should consist of a detailed and specific description of the characters and the events happening in the manga frames, without including any NSFW (Not Safe for Work) content description.
 
-    Your job is to modernize the hint in a way that provides enough information and context for the AI to generate an image using Stable Diffusion, since Stable Diffusion doesn't understand what the characters look like. The description must accurately convey the desired visual elements, actions, emotions, and relationships between characters. The modernized tooltip should be unique and distinctive and should not contain names, encouraging the AI to generate creative and original images based on this description.
+    Your task is to upgrade the prompt to provide enough information and context for the AI to generate an image using Stable Diffusion. Your description should accurately convey the desired visual elements, actions, emotions, and relationships between the characters. The upgraded prompt should be unique and distinct, encouraging the AI to generate creative and original image outputs based on the given description.
 
-    Please make sure your wording is clear and concise, and use the special option to avoid mentioning names and replace them with a description from "{manga_frames_description}" to provide a detailed and specific version of the hint.
+    Please ensure your language is clear and concise, and incorporate the special "{manga_frames_description}" to provide a detailed and specific version of the prompt.
 
-    Note: Be sure to be ethical and avoid inappropriate or offensive content in your description.
+    Note: Make sure to follow ethical guidelines and avoid any inappropriate or offensive content in your description.
     """
     
     response = openai.ChatCompletion.create(
@@ -253,7 +254,7 @@ def agent_create_images_description(manga_id: str, manga_frames_description: str
     return manga_images_description
 
 
-def generate_image(manga_id: str, manga_images_description: str, repository: MangaRepository): 
+async def generate_image(manga_id: str, manga_images_description: str, repository: MangaRepository): 
     
     replicate_api_token = REPLICATE_API_TOKEN
     imgur_client_id_value = IMGUR_CLIENT_ID

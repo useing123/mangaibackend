@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 
 from fastapi import Depends
 from pydantic import Field
@@ -14,12 +14,15 @@ from .dependencies import parse_jwt_user_data
 class GetMyAccountResponse(AppModel):
     id: Any = Field(alias="_id")
     email: str
+    first_name: Optional[str]
+    last_name: Optional[str]
+    avatar: Optional[str]
 
 
 @router.get("/users/me", response_model=GetMyAccountResponse)
 def get_my_account(
     jwt_data: JWTData = Depends(parse_jwt_user_data),
     svc: Service = Depends(get_service),
-) -> dict[str, str]:
+) -> dict[str, Any]:
     user = svc.repository.get_user_by_id(jwt_data.user_id)
     return user
