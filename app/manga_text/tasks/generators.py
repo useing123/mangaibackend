@@ -264,7 +264,7 @@ def generate_image(manga_id: str, manga_images_description: str, repository: Man
 
     for frame in frames:
         # Call the Replicate API to generate an image
-        model_version = "stability-ai/sdxl:2b017d9b67edd2ee1401238df49d75da53c523f36e363881e057f5dc3ed3c5b2"
+        model_version = "cjwbw/anything-v3-better-vae:09a5805203f4c12da649ec1923bb7729517ca25fcac790e640eaa9ed66573b65"
         inputs = {"prompt": frame}
 
         # We need to set the token environment variable for the replicate.run function
