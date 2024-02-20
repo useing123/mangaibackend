@@ -43,7 +43,7 @@ def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: Mang
     Keep this {prompt} in mind 
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=100,
         n=1,
@@ -60,7 +60,7 @@ def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, ma
     for index in range(manga_chapters_cnt):
         prompt = f"Generate a title for a chapter #{index + 1}/{manga_chapters_cnt} in manga called '{manga_title}' in {manga_genre} genre:"
         response = openai.Completion.create(
-            engine="text-davinci-003",
+            engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
             max_tokens=100,
             n=1,
@@ -77,7 +77,7 @@ def generate_main_characters(manga_id: str, manga_title: str, genre: str, reposi
     Study the features of this genre: {genre} and write detailed main character descriptions
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=450,
         n=1,
@@ -95,7 +95,7 @@ def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, 
     Study the features of this genre: {genre} and write detailed main character descriptions
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=600,
         n=1,
@@ -113,7 +113,7 @@ def generate_detailed_characters(manga_id: str, manga_title: str, main_character
     {main_characters} {funservice_characters}
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=450,
         n=1,
@@ -138,7 +138,7 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     {detailed_characters}
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=4096,
         n=1,
@@ -161,7 +161,7 @@ def agent_create_frames_description(manga_id: str, manga_chapters_story: str, re
     {manga_chapters_story}
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=3000,
         n=1,
@@ -182,7 +182,7 @@ def agent_create_dialogs(manga_id: str, manga_frames_description: str, repositor
     {manga_frames_description}
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=3000,
         n=1,
