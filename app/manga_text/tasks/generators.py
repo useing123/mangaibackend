@@ -44,7 +44,7 @@ def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: Mang
     Please generate a title for a manga in the {manga_genre} genre that incorporates the theme of "Keep this {prompt} in mind." The title should be creative, unique, and suitable for a manga in the specified genre. Your response should be a title without quotation marks.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=100,
         n=1,
@@ -61,7 +61,7 @@ def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, ma
     for index in range(manga_chapters_cnt):
         prompt = f"Generate a title for a chapter #{index + 1}/{manga_chapters_cnt} in manga called '{manga_title}' in {manga_genre} genre:"
         response = openai.Completion.create(
-            engine="text-davinci-003",
+            engine="gpt-3.5-turbo-instruct",
             prompt=prompt,
             max_tokens=100,
             n=1,
@@ -84,7 +84,7 @@ def generate_main_characters(manga_id: str, manga_title: str, genre: str, reposi
     Please note that you should tailor your descriptions to align with the specific genre and manga, ensuring that they accurately represent the style and themes of the story.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=400,
         n=1,
@@ -105,7 +105,7 @@ def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, 
     Please note that your descriptions should be detailed and focused on the fanservice elements of the characters, such as their appearance, clothing, mannerisms, and interactions with other characters. Your response should provide an accurate portrayal of the fanservice characters in the manga, while encouraging creativity and unique descriptions.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=400,
         n=1,
@@ -133,7 +133,7 @@ def generate_detailed_characters(manga_id: str, manga_title: str, main_character
     Please note that your descriptions should be detailed enough to clearly convey the visual aspects of each character, aiding in the accurate depiction and portrayal of the characters in the manga.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=500,
         n=1,
@@ -158,7 +158,7 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     Please provide a clear and concise story description that highlights the key aspects of the chapter, including the setting, conflicts, character development, and any significant events or plot twists. Your description should ignite curiosity and engage the reader's imagination, making them eager to dive into the manga chapter.tory description that highlights the key aspects of the chapter, including the setting, conflicts, character development, and any significant events or plot twists. Your description should ignite curiosity and engage the reader's imagination, making them eager to dive into the manga chapter.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=1500,
         n=1,
@@ -182,7 +182,7 @@ def agent_create_frames_description(manga_id: str, manga_title: str, genre: str,
     Your goal is to create a coherent and engaging storyline that unfolds over the course of 24 frames. Be creative and utilize the provided character descriptions to develop interesting character interactions and plot developments.
     """
     response = openai.Completion.create(
-        engine="text-davinci-003",
+        engine="gpt-3.5-turbo-instruct",
         prompt=prompt,
         max_tokens=1800,
         n=1,
@@ -195,7 +195,31 @@ def agent_create_frames_description(manga_id: str, manga_title: str, genre: str,
 
 
 #Эта штука извлекает диалоги из фреймов
+<<<<<<< HEAD
 def agent_create_dialogs(manga_id: str, manga_frames_description: str, detailed_characters: str, repository: MangaRepository) -> str:
+=======
+def agent_create_dialogs(manga_id: str, manga_frames_description: str, repository: MangaRepository) -> str:
+    prompt = f"""
+    Write what happens(dialogs, sound effects, etc.) for this manga frames:
+    give output like this:
+    Frame №1: "What happens in this frame"
+    {manga_frames_description}
+    """
+    response = openai.Completion.create(
+        engine="gpt-3.5-turbo-instruct",
+        prompt=prompt,
+        max_tokens=3000,
+        n=1,
+        stop=None,
+        temperature=0.1,
+    )
+    manga_story_dialogs = response.choices[0].text.strip()
+    repository.update_manga(manga_id, {"manga_story_dialogs": manga_story_dialogs})
+    return manga_story_dialogs
+
+#Эта штука извлекает описание сцены из фреймов надо переписать нормальной пока что это затычка нужно будет зайти в https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts/viewer/Gustavosta--Stable-Diffusion-Prompts/test и взять от туда
+def agent_create_images_description(manga_id: str, manga_frames_description: str, detailed_characters: str, repository: MangaRepository) -> str:
+>>>>>>> main
     """
     Parameters:
     manga_id (str): The ID of the manga.
