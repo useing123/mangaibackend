@@ -36,39 +36,37 @@ def fill_manga_info(manga_id: str, manga_genre: str, prompt:str, manga_chapters_
     # time.sleep(25)
     generate_image(manga_id, prompt_image_description, repository)
 
-
 def generate_title(manga_id: str, manga_genre: str, prompt:str, repository: MangaRepository) -> str:
     prompt = f"""
-    Generate a title for a manga in the {manga_genre} genre, give output without quotation marks:
-    Keep this {prompt} in mind 
+    Generate a title for a manga in the {manga_genre} genre, keeping this {prompt} in mind. Provide the output without quotation marks.
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=100,
-        n=1,
-        stop=None,
-        temperature=1,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    manga_title = response.choices[0].text.strip()
+    manga_title = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"title": manga_title})
     return manga_title
 
 
-def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, manga_chapters_cnt: int, repository: MangaRepository) -> None:
+
+def generate_chapter_title(manga_id: str, manga_genre: str, manga_title: str, manga_chapters_cnt: int, repository: MangaRepository) -> str:
     chapters = []
     for index in range(manga_chapters_cnt):
-        prompt = f"Generate a title for a chapter #{index + 1}/{manga_chapters_cnt} in manga called '{manga_title}' in {manga_genre} genre:"
-        response = openai.Completion.create(
-            engine="gpt-3.5-turbo-instruct",
-            prompt=prompt,
-            max_tokens=100,
-            n=1,
-            stop=None,
-            temperature=0.7,
+        prompt = f"""Generate a title for a chapter #{index + 1}/{manga_chapters_cnt} in manga called '{manga_title}' in {manga_genre} genre:"
+        """
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",
+            messages=[
+                {"role": "system", "content": "You are high skilled manga author."},
+                {"role": "user", "content": prompt}
+            ]
         )
-        chapters.append(response.choices[0].text.strip())
-    repository.update_manga(manga_id, {"chapters_title": chapters})
+        chapters.append(response.choices[0].message['content'].strip())
+        repository.update_manga(manga_id, {"chapters_title": chapters})
 
 
 def generate_main_characters(manga_id: str, manga_title: str, genre: str, repository: MangaRepository) -> str:
@@ -76,15 +74,14 @@ def generate_main_characters(manga_id: str, manga_title: str, genre: str, reposi
     Provide a detailed description for the main characters in the manga {manga_title}:
     Study the features of this genre: {genre} and write detailed main character descriptions
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=450,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    main_characters = response.choices[0].text.strip()
+    main_characters = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"main_characters": main_characters})
     return main_characters
 
@@ -94,15 +91,14 @@ def generate_funservice_characters(manga_id: str, manga_title: str, genre: str, 
     Provide a detailed description for the funservice characters in the manga {manga_title}:
     Study the features of this genre: {genre} and write detailed main character descriptions
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=600,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    funservice_characters = response.choices[0].text.strip()
+    funservice_characters = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"funservice_characters": funservice_characters})
     return funservice_characters
 
@@ -112,18 +108,16 @@ def generate_detailed_characters(manga_id: str, manga_title: str, main_character
     Provide a detailed description for the characters in the manga {manga_title} Description of the characters' appearance in order to draw them:
     {main_characters} {funservice_characters}
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=450,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    detailed_characters = response.choices[0].text.strip()
+    detailed_characters = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"detailed_characters": detailed_characters})
     return detailed_characters
-
 
 def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_title: str, manga_title: str, main_characters:str, funservice_characters:str, detailed_characters: str, repository: MangaRepository) -> str:
     prompt = f"""
@@ -137,20 +131,18 @@ def generate_manga_story(manga_id: str, prompt:str, genre:str, manga_chapters_ti
     Appearance description:
     {detailed_characters}
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=4096,
-        n=1,
-        stop=None,
-        temperature=0.7,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    manga_chapters_story = response.choices[0].text.strip()
+    manga_chapters_story = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"manga_chapters_story": manga_chapters_story})
     return manga_chapters_story
 
 
-#Описываем 15 кадров манги
 def agent_create_frames_description(manga_id: str, manga_chapters_story: str, repository: MangaRepository) -> str:
     prompt = f"""
     Make it 15 frames for this manga what happens in 15 frames
@@ -160,20 +152,18 @@ def agent_create_frames_description(manga_id: str, manga_chapters_story: str, re
     Frame №1: "Something happens"
     {manga_chapters_story}
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=3000,
-        n=1,
-        stop=None,
-        temperature=0.1,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    manga_frames_description = response.choices[0].text.strip()
+    manga_frames_description = response.choices[0].message['content'].strip()
     repository.update_manga(manga_id, {"manga_frames_description": manga_frames_description})
     return manga_frames_description
 
 
-#Эта штука извлекает диалоги из фреймов
 def agent_create_dialogs(manga_id: str, manga_frames_description: str, repository: MangaRepository) -> str:
     prompt = f"""
     Write what happens(dialogs, sound effects, etc.) for this manga frames:
@@ -181,19 +171,18 @@ def agent_create_dialogs(manga_id: str, manga_frames_description: str, repositor
     Frame №1: "What happens in this frame"
     {manga_frames_description}
     """
-    response = openai.Completion.create(
-        engine="gpt-3.5-turbo-instruct",
-        prompt=prompt,
-        max_tokens=3000,
-        n=1,
-        stop=None,
-        temperature=0.1,
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",
+        messages=[
+            {"role": "system", "content": "You are high skilled manga author."},
+            {"role": "user", "content": prompt}
+        ]
     )
-    manga_story_dialogs = response.choices[0].text.strip()
+    manga_story_dialogs = response.choices[0].message['content'].strip()    
     repository.update_manga(manga_id, {"manga_story_dialogs": manga_story_dialogs})
     return manga_story_dialogs
 
-#Эта штука извлекает описание сцены из фреймов надо переписать нормальной пока что это затычка нужно будет зайти в https://huggingface.co/datasets/Gustavosta/Stable-Diffusion-Prompts/viewer/Gustavosta--Stable-Diffusion-Prompts/test и взять от туда
+
 def agent_create_images_description(manga_id: str, manga_frames_description: str, detailed_characters: str, repository: MangaRepository) -> str:
     """
     Parameters:
@@ -217,6 +206,7 @@ def agent_create_images_description(manga_id: str, manga_frames_description: str
     manga_images_description = response['choices'][0]['message']['content'].strip()
     repository.update_manga(manga_id, {"manga_images_description": manga_images_description})
     return manga_images_description
+
 
 
 # Тут должна быть штука которая ИИ модель заходит в ембединг и пишет text2stable diffusion prompt
